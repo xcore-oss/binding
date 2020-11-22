@@ -1,4 +1,4 @@
-module github.com/go-macaron/binding
+module github.com/xcore-oss/binding
 
 go 1.12
 
