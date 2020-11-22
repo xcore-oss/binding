@@ -17,13 +17,13 @@ package binding
 
 import (
 	"bytes"
+	"github.com/xcore-oss/macaron"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"gopkg.in/macaron.v1"
 )
 
 var fileTestCases = []fileTestCase{

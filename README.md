@@ -9,7 +9,7 @@ Middleware binding provides request data binding and validation for [Macaron](ht
 
 ### Installation
 
-	go get github.com/go-macaron/binding
+	go get github.com/xcore-oss/binding
 	
 ## Getting Help
 

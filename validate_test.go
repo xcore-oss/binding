@@ -17,12 +17,12 @@ package binding
 
 import (
 	"fmt"
+	"github.com/xcore-oss/macaron"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"gopkg.in/macaron.v1"
 )
 
 var validationTestCases = []validationTestCase{

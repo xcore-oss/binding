@@ -18,6 +18,7 @@ package binding
 import (
 	"bytes"
 	"fmt"
+	"github.com/xcore-oss/macaron"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -25,7 +26,6 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"gopkg.in/macaron.v1"
 )
 
 var multipartFormTestCases = []multipartFormTestCase{

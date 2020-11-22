@@ -16,9 +16,8 @@
 package binding
 
 import (
+	"github.com/xcore-oss/macaron"
 	"mime/multipart"
-
-	"gopkg.in/macaron.v1"
 )
 
 // These types are mostly contrived examples, but they're used

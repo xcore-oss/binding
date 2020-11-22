@@ -19,6 +19,7 @@ package binding
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/xcore-oss/macaron"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -30,7 +31,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/unknwon/com"
-	"gopkg.in/macaron.v1"
 )
 
 func bind(ctx *macaron.Context, obj interface{}, ifacePtr ...interface{}) {
