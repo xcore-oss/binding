@@ -433,6 +433,7 @@ func validateField(errors Errors, zero interface{}, field reflect.StructField, f
 			}*/
 		}
 	}
+	fieldName := field.Tag.Get("name")
 
 VALIDATE_RULES:
 	for _, rule := range strings.Split(field.Tag.Get("binding"), ";") {
@@ -446,10 +447,11 @@ VALIDATE_RULES:
 				break VALIDATE_RULES
 			}
 		case rule == "Required":
+			message := fmt.Sprintf("%v不能为空", fieldName)
 			v := reflect.ValueOf(fieldValue)
 			if v.Kind() == reflect.Slice {
 				if v.Len() == 0 {
-					errors.Add([]string{field.Name}, ERR_REQUIRED, "Required")
+					errors.Add([]string{field.Name}, ERR_REQUIRED, message)
 					break VALIDATE_RULES
 				}
 
@@ -457,50 +459,55 @@ VALIDATE_RULES:
 			}
 
 			if reflect.DeepEqual(zero, fieldValue) {
-				errors.Add([]string{field.Name}, ERR_REQUIRED, "Required")
+				errors.Add([]string{field.Name}, ERR_REQUIRED, message)
 				break VALIDATE_RULES
 			}
 		case rule == "AlphaDash":
 			if AlphaDashPattern.MatchString(fmt.Sprintf("%v", fieldValue)) {
-				errors.Add([]string{field.Name}, ERR_ALPHA_DASH, "AlphaDash")
+				message := fmt.Sprintf("%v必须为半角英文字母、阿拉伯数字或 -_", fieldName)
+				errors.Add([]string{field.Name}, ERR_ALPHA_DASH, message)
 				break VALIDATE_RULES
 			}
 		case rule == "AlphaDashDot":
 			if AlphaDashDotPattern.MatchString(fmt.Sprintf("%v", fieldValue)) {
-				errors.Add([]string{field.Name}, ERR_ALPHA_DASH_DOT, "AlphaDashDot")
+				message := fmt.Sprintf("%v必须为半角英文字母、阿拉伯数字或 -_ 或 .", fieldName)
+				errors.Add([]string{field.Name}, ERR_ALPHA_DASH_DOT, message)
 				break VALIDATE_RULES
 			}
 		case strings.HasPrefix(rule, "Size("):
 			size, _ := strconv.Atoi(rule[5 : len(rule)-1])
+			message := fmt.Sprintf("%v长度必须为%v位", fieldName, size)
 			if str, ok := fieldValue.(string); ok && utf8.RuneCountInString(str) != size {
-				errors.Add([]string{field.Name}, ERR_SIZE, "Size")
+				errors.Add([]string{field.Name}, ERR_SIZE, message)
 				break VALIDATE_RULES
 			}
 			v := reflect.ValueOf(fieldValue)
 			if v.Kind() == reflect.Slice && v.Len() != size {
-				errors.Add([]string{field.Name}, ERR_SIZE, "Size")
+				errors.Add([]string{field.Name}, ERR_SIZE, message)
 				break VALIDATE_RULES
 			}
 		case strings.HasPrefix(rule, "MinSize("):
 			min, _ := strconv.Atoi(rule[8 : len(rule)-1])
+			message := fmt.Sprintf("%v长度必须大于%v位", fieldName, min)
 			if str, ok := fieldValue.(string); ok && utf8.RuneCountInString(str) < min {
-				errors.Add([]string{field.Name}, ERR_MIN_SIZE, "MinSize")
+				errors.Add([]string{field.Name}, ERR_MIN_SIZE, message)
 				break VALIDATE_RULES
 			}
 			v := reflect.ValueOf(fieldValue)
 			if v.Kind() == reflect.Slice && v.Len() < min {
-				errors.Add([]string{field.Name}, ERR_MIN_SIZE, "MinSize")
+				errors.Add([]string{field.Name}, ERR_MIN_SIZE, message)
 				break VALIDATE_RULES
 			}
 		case strings.HasPrefix(rule, "MaxSize("):
 			max, _ := strconv.Atoi(rule[8 : len(rule)-1])
+			message := fmt.Sprintf("%v长度必须小于%v位", fieldName, max)
 			if str, ok := fieldValue.(string); ok && utf8.RuneCountInString(str) > max {
-				errors.Add([]string{field.Name}, ERR_MAX_SIZE, "MaxSize")
+				errors.Add([]string{field.Name}, ERR_MAX_SIZE, message)
 				break VALIDATE_RULES
 			}
 			v := reflect.ValueOf(fieldValue)
 			if v.Kind() == reflect.Slice && v.Len() > max {
-				errors.Add([]string{field.Name}, ERR_MAX_SIZE, "MaxSize")
+				errors.Add([]string{field.Name}, ERR_MAX_SIZE, message)
 				break VALIDATE_RULES
 			}
 		case strings.HasPrefix(rule, "Range("):
@@ -508,14 +515,16 @@ VALIDATE_RULES:
 			if len(nums) != 2 {
 				break VALIDATE_RULES
 			}
+			message := fmt.Sprintf("%v必须大于%v并且小于%v", fieldName, nums[0], nums[1])
 			val := com.StrTo(fmt.Sprintf("%v", fieldValue)).MustInt()
 			if val < com.StrTo(nums[0]).MustInt() || val > com.StrTo(nums[1]).MustInt() {
-				errors.Add([]string{field.Name}, ERR_RANGE, "Range")
+				errors.Add([]string{field.Name}, ERR_RANGE, message)
 				break VALIDATE_RULES
 			}
 		case rule == "Email":
 			if !EmailPattern.MatchString(fmt.Sprintf("%v", fieldValue)) {
-				errors.Add([]string{field.Name}, ERR_EMAIL, "Email")
+				message := fmt.Sprintf("%v必须为邮箱地址", fieldName)
+				errors.Add([]string{field.Name}, ERR_EMAIL, message)
 				break VALIDATE_RULES
 			}
 		case rule == "Url":
@@ -523,7 +532,8 @@ VALIDATE_RULES:
 			if len(str) == 0 {
 				continue
 			} else if !isURL(str) {
-				errors.Add([]string{field.Name}, ERR_URL, "Url")
+				message := fmt.Sprintf("%v必须为 HTTP/HTTPS URL 地址", fieldName)
+				errors.Add([]string{field.Name}, ERR_URL, message)
 				break VALIDATE_RULES
 			}
 		case strings.HasPrefix(rule, "In("):
